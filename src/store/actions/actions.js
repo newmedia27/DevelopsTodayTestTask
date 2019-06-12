@@ -1,7 +1,9 @@
-import {TEST} from "./actionsTypes";
+import {SET_POSTS} from "./actionsTypes";
 
-export function test() {
+
+export function setPosts(posts) {
     return {
-        type: TEST
+        type: SET_POSTS,
+        payload: posts,
     }
 }

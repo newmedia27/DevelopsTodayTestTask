@@ -1,1 +1,1 @@
-export const TEST = 'TEST';
+export const SET_POSTS = 'SET_POSTS';
