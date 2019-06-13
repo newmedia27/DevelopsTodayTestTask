@@ -1,118 +1,142 @@
-import React, {useEffect} from 'react';
-import styled from 'styled-components';
-import {axiosClient} from "../tools/axiosClient";
-import {NavLink} from "react-router-dom";
-import {connect} from "react-redux";
-import {setPosts} from "../store/actions/actions";
+import React, { useEffect } from 'react'
+import styled from 'styled-components'
+import { NavLink, withRouter } from 'react-router-dom'
+import { connect } from 'react-redux'
+
+import { getPosts } from '../store/creator/getPosts'
 
 const Posts = props => {
 
-    const PostsAPI = `https://simple-blog-api.crew.red/posts`;
+  const { getPosts } = props
 
+  useEffect(() => {
 
-    useEffect(() => {
-        (async () => {
-            const request = axiosClient();
-            try {
-                const response = await request.get(PostsAPI)
-                if (response.status === 200) {
-                    // console.log(response.data);
-                    props.setPosts(response.data)
-                }
-            } catch (e) {
+    getPosts()
 
-            }
-        })()
+  }, [getPosts])
 
-    }, [])
-    console.log(props);
-    return (
-        <PostsWrapper>
+  return (
+    <PostsWrapper>
+      {
+        !props.posts.length
+          ?<NotPosts><CreateLink
+          onClick={()=>props.history.push(`/add-post`)}
+          >Add a newPost</CreateLink></NotPosts>
+          :<>
             <Div>
-                <NavLink to="/add-post">Add a newPost</NavLink>
+              <NavLink to="/add-post">Add a newPost</NavLink>
             </Div>
             <Content>
-                {
-                    props.posts && props.posts.map((item) => (
-                        <PostElementWrapper
-                            key={item.id}
-                        >
-                            <Title>{item.title}</Title>
-                            <BodyText>{item.body}</BodyText>
-                            <span><NavLink to={`post/${item.id}`}>learn more</NavLink></span>
-                        </PostElementWrapper>
-                    ))
-                }
+              {
+                props.posts && props.posts.map((item) => (
+                  <PostElementWrapper
+                    key={item.id}
+                  >
+                    <Title>{item.title}</Title>
+                    <BodyText>{item.body}</BodyText>
+                    <PostElementFooterWrapper>
+                      <Date>{item.date && item.date}</Date>
+                      <LearnMore
+
+                        onClick={() => props.history.push(`/post/${item.id}`)}
+
+                      >learn more </LearnMore>
+                    </PostElementFooterWrapper>
+                  </PostElementWrapper>
+                ))
+              }
             </Content>
-        </PostsWrapper>
-    );
+          </>
+      }
+
+    </PostsWrapper>
+  )
 
 }
 
 function mapStateToProps(state) {
-    return {
-        posts: state.posts.posts
-    }
+  return {
+    posts: state.posts.posts,
+  }
 }
 
 function mapDispatchToProps(dispatch) {
-    return {
-        setPosts: e => dispatch(setPosts(e))
-    }
+  return {
+    getPosts: e => dispatch(getPosts(e)),
+  }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Posts);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Posts))
 
+const NotPosts=styled.h1`
+text-align:center;
 
+`;const CreateLink = styled.span`
+color:blue;
+cursor:pointer;
+font-size:1.2rem;
+`
 const PostsWrapper = styled.section`
-  max-width: 1366px;
+  max-width: 960px;
   min-width:50rem;
   margin: 0 auto;
   padding: 1rem;
   background: papayawhip;
   box-shadow:0 1px 4px black;
   border-radius:1rem;
-  margin-top:2rem;
   display:flex;
   flex-direction:column;
-
-`;
+`
 
 const Div = styled.div`
 margin-left:auto;
 margin-right:.5rem;
 box-sizing:content-box;
 margin-bottom:1rem;
-`;
+`
 const Content = styled.div`
 
-border:1px solid black;
 display:block;
 width:100%;
 
 `
 const PostElementWrapper = styled.div`
-
+border-bottom:1px solid black;
+padding:.5rem;
  display: flex;
-    flex-direction: column;
-    // justify-content: center;
-    // align-items: center;
+ flex-direction: column;
 
-`;
+`
 const Title = styled.h1`
 font-size:2rem;
 color:purple;
 line-height:1;
-    margin-bottom: .5rem;
+margin-bottom: 1.5rem;
 text-align: center;
-    text-transform: capitalize;
-
-`;
+text-transform: capitalize;
+max-width:720px;
+align-self:center;
+`
 const BodyText = styled.p`
 font-size:2rem;
 color:black;
 line-height:1;
-    margin-bottom: .5rem;
-    text-align: left;
+margin-bottom: .5rem;
+text-align: left;
+max-width:720px;
+width:100%;
+margin:0 auto;
 
-`;
+`
+
+const LearnMore = styled.span`
+color:blue;
+cursor:pointer;
+margin-left:auto;
+font-size:1.2rem;
+`
+const PostElementFooterWrapper = styled.div`
+padding:.2rem 0;
+display:flex;
+`
+const Date = styled.span``

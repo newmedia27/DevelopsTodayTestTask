@@ -1,7 +1,9 @@
 import React, {useState} from 'react';
-import PropTypes from 'prop-types';
+
 import styled from "styled-components";
 import {axiosClient} from "../tools/axiosClient";
+import { withRouter } from 'react-router-dom'
+import { getTimeNow } from '../tools/getTimeNow'
 
 const AddPost = props => {
     const API = `https://simple-blog-api.crew.red/posts`;
@@ -19,9 +21,12 @@ const AddPost = props => {
     const onClickHandler = async () => {
         const request = axiosClient();
         if(inputValue&&textareaValue){
-            const data = {'title':inputValue,'body':textareaValue}
+            const data = {'title':inputValue,'body':textareaValue,date: getTimeNow(),}
             try {
                 const response = await request.post(API,data)
+              if(response.status === 201){
+                props.history.push(`/`)
+              }
                 console.log(response.data);
             } catch (e) {
                 console.log(e);
@@ -31,6 +36,11 @@ const AddPost = props => {
     }
     return (
         <Wrapper>
+          <Header>
+            <Back
+              onClick={() => props.history.push(`/`)}
+            >To Posts</Back>
+           </Header>
             <Label>Add Title</Label>
             <Input
                 type="text"
@@ -44,6 +54,7 @@ const AddPost = props => {
                 onChange={e => onChangeHandler(e)}
             ></Textarea>
             <Button
+              disabled={!inputValue || !textareaValue}
                 onClick={onClickHandler}
             >SEND</Button>
         </Wrapper>
@@ -51,22 +62,20 @@ const AddPost = props => {
 
 }
 
-AddPost.propTypes = {};
 
-export default AddPost;
+export default withRouter(AddPost);
 
 const Wrapper = styled.div`
-  max-width: 1366px;
+ max-width: 960px;
+  min-width:50rem;
   margin: 0 auto;
   padding: 1rem;
   background: papayawhip;
   box-shadow:0 1px 4px black;
   border-radius:1rem;
-  margin-top:2rem;
   display:flex;
   flex-direction:column;
-   justify-content: center;
-    align-items: center;
+  align-items: center;
 `;
 
 const Label = styled.h2`
@@ -107,3 +116,16 @@ outline:none;
     margin-bottom: .5rem;
 
 `;
+
+const Header = styled.div`
+display:flex;
+max-width:50rem;
+width:100%;
+margin-bottom:1rem;
+justify-content: space-between;
+`
+const Back = styled.span`
+color:blue;
+cursor:pointer;
+text-transform:uppercase;
+`

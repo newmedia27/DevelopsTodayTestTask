@@ -12,7 +12,6 @@ export default function postsReducer(state = initialState, action) {
                 posts: action.payload,
             };
 
-
         default:
             return state
     }
